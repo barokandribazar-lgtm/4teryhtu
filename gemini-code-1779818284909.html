@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Animation Studio</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-color: #030008;
+            --purple-glow: rgba(138, 43, 226, 0.6);
+            --purple-neon: #a146ff;
+            --glass-bg: rgba(15, 8, 25, 0.4);
+            --glass-border: rgba(161, 70, 255, 0.2);
+            --text-main: #f3f0f7;
+            --text-muted: #a39cb0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Futuristic Liquid Glass Background Blobs */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            z-index: -1;
+            border-radius: 50%;
+            filter: blur(120px);
+            mix-blend-mode: screen;
+            opacity: 0.4;
+            animation: liquidMove 12s infinite alternate ease-in-out;
+        }
+
+        body::before {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(45deg, #4d008c, #aa00ff);
+            top: -10%;
+            left: -10%;
+        }
+
+        body::after {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(45deg, #1e003b, #6a00bf);
+            bottom: -10%;
+            right: -10%;
+            animation-delay: -6s;
+        }
+
+        @keyframes liquidMove {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(80px, 50px) scale(1.2); }
+        }
+
+        /* Floating Navigation Bar */
+        nav {
+            position: fixed;
+            top: 24px;
+            z-index: 100;
+            width: 90%;
+            max-width: 500px;
+            background: rgba(10, 5, 18, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 15px var(--glass-border);
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #fff, var(--purple-neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Main Container & Luxury Layout */
+        main {
+            margin-top: 120px;
+            margin-bottom: 60px;
+            width: 90%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Glassmorphism Premium Cards */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 30px;
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 20px 40px rgba(0,0,0,0.7);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card:hover {
+            border-color: rgba(161, 70, 255, 0.4);
+            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), 0 20px 40px rgba(0,0,0,0.8), 0 0 30px rgba(138, 43, 226, 0.15);
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        /* Premium Form Inputs */
+        .upload-zone {
+            border: 2px dashed rgba(161, 70, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(161, 70, 255, 0.02);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--purple-neon);
+            background: rgba(161, 70, 255, 0.05);
+        }
+
+        .upload-zone input[type="file"] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .preview-box {
+            margin-top: 15px;
+            max-height: 200px;
+            width: auto;
+            border-radius: 14px;
+            display: none;
+            object-fit: cover;
+            border: 1px solid var(--glass-border);
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            background: rgba(5, 2, 10, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 16px;
+            color: #fff;
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        textarea:focus {
+            border-color: var(--purple-neon);
+            box-shadow: 0 0 15px rgba(161, 70, 255, 0.2);
+        }
+
+        /* Luxury Interactive Button */
+        .btn-generate {
+            width: 100%;
+            background: linear-gradient(135deg, #a146ff, #6a00bf);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 0 20px var(--purple-glow);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px #a146ff;
+            filter: brightness(1.1);
+        }
+
+        .btn-generate:active {
+            transform: translateY(1px);
+        }
+
+        /* AI Prompt Expansion Reveal Section */
+        .ai-prompt-box {
+            background: rgba(161, 70, 255, 0.05);
+            border-left: 3px solid var(--purple-neon);
+            padding: 16px;
+            border-radius: 0 16px 16px 0;
+            font-size: 0.9rem;
+            color: #d1c9df;
+            margin-top: 15px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Step Tracking / Cinematic Loading State */
+        .loading-container {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .loading-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .loading-step.active {
+            color: var(--purple-neon);
+            font-weight: 500;
+        }
+
+        .loading-step i {
+            font-size: 1.1rem;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(161, 70, 255, 0.2);
+            border-top: 2px solid var(--purple-neon);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        .loading-step.active .spinner {
+            display: inline-block;
+        }
+
+        /* Video Output & Download Presentation */
+        .output-section {
+            display: none;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        video {
+            width: 100%;
+            border-radius: 22px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            background: #000;
+        }
+
+        .btn-download {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border-radius: 20px;
+            padding: 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-download:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">
+            <i data-lucide="clapperboard"></i> AI Animation Studio
+        </div>
+        <div style="color: var(--text-muted); font-size: 0.85rem; font-weight:500; tracking: 1px;">v2.6</div>
+    </nav>
+
+    <main>
+        
+        <div class="card" id="input-card">
+            
+            <h2>Upload Your Image</h2>
+            <div class="desc">Upload your JPG or PNG image.</div>
+            <div class="upload-zone" id="drop-zone">
+                <i data-lucide="image" style="width: 32px; height: 32px; color: var(--purple-neon); margin-bottom: 8px;"></i>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">Drag & drop or tap to browse</p>
+                <input type="file" id="image-input" accept="image/png, image/jpeg">
+                <img id="image-preview" class="preview-box" alt="Upload preview">
+            </div>
+
+            <div style="height: 25px;"></div>
+
+            <h2>Animation Instructions</h2>
+            <div class="desc">Describe how you want your image to move or animate.</div>
+            <textarea id="instructions-input" placeholder="e.g., Make the background clouds drift slowly while the neon signs flicker dynamically with a cinematic pan..."></textarea>
+
+            <div style="height: 25px;"></div>
+
+            <button class="btn-generate" id="generate-btn">
+                <i data-lucide="sparkles"></i> Generate Animated Video
+            </button>
+
+            <div class="loading-container" id="loading-box">
+                <div class="loading-step" id="step-prompt">
+                    <div class="spinner"></div>
+                    <i data-lucide="check-circle" class="check-icon" style="display:none; color:#10b981;"></i>
+                    <span>Optimizing AI Core video prompt...</span>
+                </div>
+                <div class="ai-prompt-box" id="prompt-output"></div>
+
+                <div class="loading-step" id="step-video">
+                    <div class="spinner"></div>
+                    <i data-lucide="check-circle" class="check-icon" style="display:none; color:#10b981;"></i>
+                    <span>Simulating diffusion matrix animation passes...</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card output-section" id="output-card">
+            <h2>Generated Animation</h2>
+            <div class="desc">Your automated high-fidelity luxury render is complete.</div>
+            
+            <video id="video-player" controls loop playsinline></video>
+            
+            <button class="btn-download" id="download-btn">
+                <i data-lucide="download"></i> Download Video
+            </button>
+        </div>
+
+    </main>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // DOM Elements Configuration
+        const imageInput = document.getElementById('image-input');
+        const imagePreview = document.getElementById('image-preview');
+        const dropZone = document.getElementById('drop-zone');
+        const instructionsInput = document.getElementById('instructions-input');
+        const generateBtn = document.getElementById('generate-btn');
+        const loadingBox = document.getElementById('loading-box');
+        const stepPrompt = document.getElementById('step-prompt');
+        const stepVideo = document.getElementById('step-video');
+        const promptOutput = document.getElementById('prompt-output');
+        const outputCard = document.getElementById('output-card');
+        const videoPlayer = document.getElementById('video-player');
+        const downloadBtn = document.getElementById('download-btn');
+
+        let uploadedFileName = "animated_masterpiece.mp4";
+
+        // Asset Handling: Interactive Image Upload Preview
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                uploadedFileName = file.name.split('.')[0] + "_animated.mp4";
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    imagePreview.src = event.target.result;
+                    imagePreview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Pipeline Automation Flow Control
+        generateBtn.addEventListener('click', async () => {
+            const instructions = instructionsInput.value.trim();
+            
+            if (!imageInput.files[0]) {
+                alert("Please upload an image asset first to initiate generation.");
+                return;
+            }
+            if (!instructions) {
+                alert("Please provide animation instructions detailing your creative vision.");
+                return;
+            }
+
+            // Lock interface interactive UI state
+            generateBtn.disabled = true;
+            generateBtn.style.opacity = "0.5";
+            loadingBox.style.display = 'flex';
+            outputCard.style.display = 'none';
+            
+            // Reset loader milestones
+            resetStep(stepPrompt);
+            resetStep(stepVideo);
+            promptOutput.style.display = 'none';
+
+            // --- STEP 3: Generate Video Prompt (Expert System Simulation) ---
+            setStepActive(stepPrompt);
+            await delay(2000); 
+            
+            // Expert Prompt Generator System logic merges image parameters and intent descriptions
+            const enhancedPrompt = `[Source Asset: ${imageInput.files[0].name}] High-fidelity 4K motion synthesis. Dynamic animation trajectory: ${instructions}. Smooth cinematic flow, volumetric lighting adjustments, temporal consistency optimization, 60fps luxury render execution.`;
+            
+            promptOutput.innerText = `✨ Generated Expert Video Prompt:\n"${enhancedPrompt}"`;
+            promptOutput.style.display = 'block';
+            setStepComplete(stepPrompt);
+
+            // --- STEP 4: Generate Animated Video Asset ---
+            setStepActive(stepVideo);
+            await delay(3500); // Production simulation delay loop
+            setStepComplete(stepVideo);
+
+            // --- STEP 5: Display Video and Download Presentation Setup ---
+            // High aesthetic placeholder visual matching the ambient ecosystem color palette
+            videoPlayer.src = "https://assets.mixkit.co/videos/preview/mixkit-abstract-laser-lights-background-42013-large.mp4"; 
+            
+            // Unlock view panel
+            outputCard.style.display = 'block';
+            outputCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+            // Re-enable interface interactive UI state
+            generateBtn.disabled = false;
+            generateBtn.style.opacity = "1";
+        });
+
+        // Simulated action to handle download event mechanics
+        downloadBtn.addEventListener('click', () => {
+            const a = document.createElement('a');
+            a.href = videoPlayer.src;
+            a.download = uploadedFileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+
+        // Pipeline Utility Methods
+        function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+        function setStepActive(stepElement) {
+            stepElement.classList.add('active');
+            stepElement.querySelector('.spinner').style.display = 'inline-block';
+            stepElement.querySelector('.check-icon').style.display = 'none';
+        }
+
+        function setStepComplete(stepElement) {
+            stepElement.classList.remove('active');
+            stepElement.querySelector('.spinner').style.display = 'none';
+            stepElement.querySelector('.check-icon').style.display = 'inline-block';
+            stepElement.style.color = '#10b981';
+        }
+
+        function resetStep(stepElement) {
+            stepElement.classList.remove('active');
+            stepElement.querySelector('.spinner').style.display = 'none';
+            stepElement.querySelector('.check-icon').style.display = 'none';
+            stepElement.style.color = 'var(--text-muted)';
+        }
+    </script>
+</body>
+</html>
